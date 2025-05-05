@@ -11,11 +11,30 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         file_path = options['file_path']
 
+        # Get all field names from the Product model (excluding category since we'll handle it specially)
+        field_names = [field.name for field in Product._meta.fields if field.name != 'category']
+        
+        # Create a custom header with category_name and category_location instead of just category
+        header = ['category_name', 'category_location'] + field_names
+        
         with open(file_path, 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['Category', 'Name', 'Balance', 'Title', 'Info', 'Slug', 'Price', 'Status',  'PDF'])
+            writer.writerow(header)
+            
+            # Use select_related to efficiently fetch category data in a single query
+            products = Product.objects.all().select_related('category')
+            
+            for product in products:
+                # Create row with category name and location first, then all other fields
+                row = [
+                    product.category.name,  # Use category name instead of ID
+                    product.category.location,  # Add category location
+                ]
+                
+                # Add all other product fields
+                for field in field_names:
+                    row.append(getattr(product, field))
+                
+                writer.writerow(row)
 
-            for product in Product.objects.all():
-                writer.writerow([product.category, product.name, product.Balance, product.Title, product.Info, product.slug, product.price, product.Status, product.pdf])
-
-        self.stdout.write(self.style.SUCCESS('Products exported successfully.'))
+        self.stdout.write(self.style.SUCCESS(f'Successfully exported {products.count()} products with category details.'))
