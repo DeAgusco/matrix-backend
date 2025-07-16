@@ -5,7 +5,7 @@ This Django management command allows you to generate random invoices with custo
 ## Usage
 
 ```bash
-python manage.py generate_random_invoices <count> --start-date <YYYY-MM-DD> --end-date <YYYY-MM-DD> [--status <status_code>]
+python manage.py generate_random_invoices <count> --start-date <YYYY-MM-DD> --end-date <YYYY-MM-DD> [--status <status_code>] [--user <email_or_username>]
 ```
 
 ## Parameters
@@ -18,6 +18,7 @@ python manage.py generate_random_invoices <count> --start-date <YYYY-MM-DD> --en
   - `0`: Unconfirmed
   - `1`: Partially Confirmed
   - `2`: Confirmed
+- `--user` (optional): Specific customer email or username to use for all invoices
 
 ## Examples
 
@@ -36,12 +37,22 @@ python manage.py generate_random_invoices 50 --start-date 2024-01-01 --end-date 
 python manage.py generate_random_invoices 25 --start-date 2024-01-15 --end-date 2024-01-21
 ```
 
+### Generate 75 invoices for a specific user by email:
+```bash
+python manage.py generate_random_invoices 75 --start-date 2024-01-01 --end-date 2024-01-31 --user john@example.com
+```
+
+### Generate 30 confirmed invoices for a specific user by username:
+```bash
+python manage.py generate_random_invoices 30 --start-date 2024-02-01 --end-date 2024-02-28 --status 2 --user johndoe
+```
+
 ## What Gets Randomized
 
 The command automatically randomizes the following fields:
 
 - **Product**: Randomly selected from active products (`Status=True`)
-- **Customer**: Randomly selected from active customers (`is_active=True`)
+- **Customer**: Randomly selected from active customers (`is_active=True`) or specific user if `--user` is provided
 - **Date**: Random date/time between your specified start and end dates
 - **Order ID**: Generated in format `INV-XXXXXXXXXXXX` (12 random characters)
 - **Status**: Random status (-1 to 2) unless you specify a fixed status
@@ -56,7 +67,8 @@ The command automatically randomizes the following fields:
 ## Requirements
 
 - At least one active product (`Status=True`) must exist
-- At least one active customer (`is_active=True`) must exist
+- At least one active customer (`is_active=True`) must exist (unless `--user` is specified)
+- If `--user` is provided, the specified customer must exist and be active
 - Start date must be before or equal to end date
 
 ## Output

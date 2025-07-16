@@ -3,6 +3,7 @@ import string
 from datetime import datetime, timedelta
 from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
+from django.db import models
 from payment.models import Invoice
 from accounts.models import Customer
 from store.models import Product
@@ -35,12 +36,18 @@ class Command(BaseCommand):
             choices=[-1, 0, 1, 2],
             help='Specific status to use (optional, otherwise random)'
         )
+        parser.add_argument(
+            '--user',
+            type=str,
+            help='Specific user email or username to use (optional, otherwise random)'
+        )
 
     def handle(self, *args, **options):
         count = options['count']
         start_date_str = options['start_date']
         end_date_str = options['end_date']
         fixed_status = options.get('status')
+        user_identifier = options.get('user')
 
         # Parse dates
         try:
@@ -52,14 +59,30 @@ class Command(BaseCommand):
         if start_date > end_date:
             raise CommandError('Start date cannot be after end date')
 
-        # Get available products and customers
+        # Get available products
         products = list(Product.objects.filter(Status=True))
-        customers = list(Customer.objects.filter(is_active=True))
-
         if not products:
             raise CommandError('No active products found')
-        if not customers:
-            raise CommandError('No active customers found')
+
+        # Handle customer selection
+        if user_identifier:
+            # Try to find specific customer by email or username
+            try:
+                customer = Customer.objects.get(
+                    models.Q(email=user_identifier) | models.Q(username=user_identifier),
+                    is_active=True
+                )
+                customers = [customer]  # Use only this customer
+                self.stdout.write(f'Using specific customer: {customer.username} ({customer.email})')
+            except Customer.DoesNotExist:
+                raise CommandError(f'Customer not found with email/username: {user_identifier}')
+            except Customer.MultipleObjectsReturned:
+                raise CommandError(f'Multiple customers found with identifier: {user_identifier}')
+        else:
+            # Get all active customers for random selection
+            customers = list(Customer.objects.filter(is_active=True))
+            if not customers:
+                raise CommandError('No active customers found')
 
         # Status choices
         status_choices = [-1, 0, 1, 2]
@@ -74,9 +97,14 @@ class Command(BaseCommand):
                     datetime.combine(random_date, datetime.min.time())
                 )
 
-                # Random product and customer
+                # Random product and customer selection
                 product = random.choice(products)
-                customer = random.choice(customers)
+                if len(customers) == 1:
+                    # Use the specific customer
+                    customer = customers[0]
+                else:
+                    # Random customer selection
+                    customer = random.choice(customers)
 
                 # Generate random data
                 order_id = self.generate_order_id()
