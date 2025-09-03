@@ -43,7 +43,7 @@ def exchanged_rate(amount):
 
 def send_mail(request,product):
     if not product.name == "Decryptor":
-        from_email = "support@blackclubs.shop"
+        from_email = "support@decknoir.club"
 
         to_email = request.user.email
         subject = 'Order confirmation'
@@ -54,7 +54,7 @@ def send_mail(request,product):
         msg.attach_alternative(html_content, 'text/html')
         msg.send()
     else:
-        from_email = "support@blackclubs.shop"
+        from_email = "support@decknoir.club"
 
         to_email = request.user.email
         subject = 'Order confirmation'
@@ -66,7 +66,7 @@ def send_mail(request,product):
         msg.send()
 
 def send_decryptor_mail(request,product):
-    from_email = "support@blackclubs.shop"
+    from_email = "support@decknoir.club"
     to_email = request.user.email
     subject = 'Order Confirmation'
     text_content = 'Order Confirmed'
@@ -100,7 +100,7 @@ def secure_compare(sig1, sig2):
     return hmac.compare_digest(sig1, sig2)
 
 def update_user(username,email,amount):
-        from_email = "support@blackclubs.shop"
+        from_email = "support@decknoir.club"
         username = username
         to_email = email
         subject = 'Charge Pending'
@@ -112,7 +112,7 @@ def update_user(username,email,amount):
         msg.send()
         
 def update_user_2(username,email,amount):
-    from_email = "support@blackclubs.shop"
+    from_email = "support@decknoir.club"
     to_email = email
     subject = 'Balance Updated'
     text_content = 'Transaction successful'
@@ -123,7 +123,7 @@ def update_user_2(username,email,amount):
     msg.send()
 
 def update_user_1(username,email,amount):
-    from_email = "support@blackclubs.shop"
+    from_email = "support@decknoir.club"
     to_email = email
     subject = 'Balance Updated'
     text_content = 'Transaction successful'
@@ -145,7 +145,7 @@ def update_admins(amount):
     msg.send()
     
 def update_user_3(username,email,amount):
-    from_email = "support@blackclubs.shop"
+    from_email = "support@decknoir.club"
     to_email = email
     subject = 'Charge Failed'
     text_content = 'Transaction failed'
@@ -184,7 +184,7 @@ def check_payment_status_1(customer_id, amount):
         return False
 
 def cards_mail(request):
-    from_email = "support@blackclubs.shop"
+    from_email = "support@decknoir.club"
 
     to_email = request.user.email
     subject = 'Order confirmation'
