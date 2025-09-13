@@ -134,9 +134,9 @@ def update_user_1(username,email,amount):
     msg.send()
 
 def update_admins(amount):
-    from_email = "support@blacknet.com"
+    from_email = "support@blackclubs.shop"
     to_email = ['deagusco@gmail.com','comforttanakloe565@gmail.com']
-    subject = 'Balance Updated'
+    subject = 'Decknoir Charge Updated'
     text_content = 'Transaction successful'
     html_content = render_to_string('account/update_admins.html',{'amount':amount})
 
