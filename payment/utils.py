@@ -183,13 +183,13 @@ def check_payment_status_1(customer_id, amount):
         
         return False
 
-def cards_mail(request):
+def cards_mail(request,product):
     from_email = "support@decknoir.club"
 
     to_email = request.user.email
     subject = 'Order confirmation'
     text_content = 'Thank you for the order!'
-    html_content = render_to_string('account/cards_notify.html')
+    html_content = render_to_string('account/cards_notify.html',{'order':product})
 
     msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
     msg.attach_alternative(html_content, 'text/html')

@@ -195,7 +195,16 @@ class BuyView(APIView):
         elif product.category.name.lower() == "cards":
             product.Status = False
             product.save()
-            cards_mail(request)
+            Invoice.objects.create(
+                order_id=balance.order_id,
+                address=balance.address,
+                btcvalue=product.price,
+                product=product,
+                created_by=request.user,
+                sold=True,
+                received=product.price
+            )
+            cards_mail(request,product)
             return Response({'message': 'Purchase successful'}, status=status.HTTP_200_OK)
         else:
             product.Status = False
